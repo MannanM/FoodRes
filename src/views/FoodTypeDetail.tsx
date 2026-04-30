@@ -28,19 +28,28 @@ const FoodTypeDetail = () => {
   
   const items = useMemo(() => {
     return state.items
-      .filter(item => item.foodTypeId === id && item.quantity > 0)
+      .filter(item => item.foodTypeId === id)
       .sort((a, b) => {
-        // RED items pushed to the top
-        const statA = getExpirationStatus(a.useByDate, a.bestBeforeDate);
-        const statB = getExpirationStatus(b.useByDate, b.bestBeforeDate);
-        
-        if (statA === 'RED' && statB !== 'RED') return -1;
-        if (statA !== 'RED' && statB === 'RED') return 1;
+        // Active stock first
+        if (a.quantity > 0 && b.quantity === 0) return -1;
+        if (a.quantity === 0 && b.quantity > 0) return 1;
 
-        // Then by expiration soonest
-        const expA = a.useByDate || a.bestBeforeDate || '9999-12-31';
-        const expB = b.useByDate || b.bestBeforeDate || '9999-12-31';
-        return new Date(expA).getTime() - new Date(expB).getTime();
+        if (a.quantity > 0 && b.quantity > 0) {
+          // RED items pushed to the top within active stock
+          const statA = getExpirationStatus(a.useByDate, a.bestBeforeDate);
+          const statB = getExpirationStatus(b.useByDate, b.bestBeforeDate);
+          
+          if (statA === 'RED' && statB !== 'RED') return -1;
+          if (statA !== 'RED' && statB === 'RED') return 1;
+
+          // Then by expiration soonest
+          const expA = a.useByDate || a.bestBeforeDate || '9999-12-31';
+          const expB = b.useByDate || b.bestBeforeDate || '9999-12-31';
+          return new Date(expA).getTime() - new Date(expB).getTime();
+        }
+
+        // For both quantity 0, sort by purchase date (newest first)
+        return new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime();
       });
   }, [state, id]);
 
@@ -57,7 +66,7 @@ const FoodTypeDetail = () => {
     const dataPoints: { date: string, timestamp: number, purchasePrice?: number, marketPrice?: number, unit: string }[] = [];
 
     itemsWithPrice.forEach(item => {
-      const unitPrice = (item.price! / (item.baseAmount * item.quantity)) * 100;
+      const unitPrice = (item.price! / item.baseAmount) * 100;
       dataPoints.push({
         date: new Date(item.purchaseDate).toLocaleDateString(),
         timestamp: new Date(item.purchaseDate).getTime(),
@@ -68,7 +77,10 @@ const FoodTypeDetail = () => {
 
     if (state.priceLogs) {
       state.priceLogs.forEach(log => {
-        if (foodTypeUpcs.has(log.upc)) {
+        const isUpcMatch = log.upc && foodTypeUpcs.has(log.upc);
+        const isNameMatch = log.name && items.some(i => i.name === log.name);
+        
+        if (isUpcMatch || isNameMatch) {
           const unitPrice = (log.price / log.baseAmount) * 100;
           dataPoints.push({
             date: new Date(log.dateLogged).toLocaleDateString(),
@@ -94,7 +106,9 @@ const FoodTypeDetail = () => {
     const currentItems = state.items.filter(item => item.foodTypeId === id && item.quantity > 0 && item.price && item.price > 0 && item.upc);
 
     currentItems.forEach(item => {
-      const logs = state.priceLogs!.filter(log => log.upc === item.upc).sort((a, b) => new Date(b.dateLogged).getTime() - new Date(a.dateLogged).getTime());
+      const logs = state.priceLogs!.filter(log => 
+        (item.upc && log.upc === item.upc) || (!item.upc && log.name === item.name)
+      ).sort((a, b) => new Date(b.dateLogged).getTime() - new Date(a.dateLogged).getTime());
       
       if (logs.length > 0) {
         hasMarketData = true;
@@ -103,7 +117,7 @@ const FoodTypeDetail = () => {
         const currentAmount = item.baseAmount * item.quantity;
         const itemReplacementCost = marketUnitPrice * currentAmount;
         
-        totalPaid += item.price!;
+        totalPaid += (item.price! * item.quantity);
         replacementCost += itemReplacementCost;
       }
     });
@@ -180,18 +194,34 @@ const FoodTypeDetail = () => {
       <div className="space-y-3">
         <h3 className="text-lg font-semibold text-slate-800 mt-2">Individual Items</h3>
         {items.length === 0 ? (
-          <p className="text-slate-500 text-center py-4">No items left.</p>
+          <p className="text-slate-500 text-center py-4">No items added to this group yet.</p>
         ) : (
           items.map(item => {
-            const status = getExpirationStatus(item.useByDate, item.bestBeforeDate);
+            const isOutOfStock = item.quantity === 0;
+            const status = isOutOfStock ? 'GREEN' : getExpirationStatus(item.useByDate, item.bestBeforeDate);
+            
             return (
-              <div key={item.id} className={`bg-white p-4 rounded-xl shadow-sm border ${status === 'RED' ? 'border-danger bg-red-50' : status === 'YELLOW' ? 'border-warning bg-yellow-50' : 'border-slate-200'}`}>
+              <div 
+                key={item.id} 
+                className={`bg-white p-4 rounded-xl shadow-sm border transition-opacity ${
+                  isOutOfStock ? 'opacity-60 border-dashed border-slate-300' :
+                  status === 'RED' ? 'border-danger bg-red-50' : 
+                  status === 'YELLOW' ? 'border-warning bg-yellow-50' : 
+                  'border-slate-200'
+                }`}
+              >
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <h4 className="font-medium text-slate-900">{item.name}</h4>
-                    <span className="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-full font-medium inline-block mt-1">
-                      x{item.quantity}
-                    </span>
+                    <h4 className={`font-medium ${isOutOfStock ? 'text-slate-500 line-through' : 'text-slate-900'}`}>{item.name}</h4>
+                    {isOutOfStock ? (
+                      <span className="bg-slate-200 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-block mt-1">
+                        Out of Stock
+                      </span>
+                    ) : (
+                      <span className="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-full font-medium inline-block mt-1">
+                        x{item.quantity}
+                      </span>
+                    )}
                   </div>
                   <button 
                     onClick={() => navigate(`/edit-item/${item.id}`)}
@@ -202,18 +232,18 @@ const FoodTypeDetail = () => {
                 </div>
                 
                 {item.imageUrl && (
-                  <div className="mb-3">
+                  <div className={`mb-3 ${isOutOfStock ? 'grayscale opacity-50' : ''}`}>
                     <img src={item.imageUrl} alt={item.name} className="w-full h-32 object-cover rounded-lg border border-slate-200" />
                   </div>
                 )}
                 
-                <div className="grid grid-cols-2 gap-2 text-sm text-slate-600">
+                <div className={`grid grid-cols-2 gap-2 text-sm ${isOutOfStock ? 'text-slate-400' : 'text-slate-600'}`}>
                   <div>Amount: {formatBaseAmount(item.baseAmount, item.unitType)}</div>
-                  {item.price && <div>Price: ${item.price.toFixed(2)}</div>}
+                  {item.price && <div>Price/Unit: ${item.price.toFixed(2)}</div>}
                   
                   <div className="col-span-2 flex items-center mt-1">
-                    {status === 'RED' && <AlertCircle size={14} className="text-danger mr-1" />}
-                    <span className={status === 'RED' ? 'text-danger font-medium' : status === 'YELLOW' ? 'text-warning font-medium' : ''}>
+                    {!isOutOfStock && status === 'RED' && <AlertCircle size={14} className="text-danger mr-1" />}
+                    <span className={!isOutOfStock && status === 'RED' ? 'text-danger font-medium' : !isOutOfStock && status === 'YELLOW' ? 'text-warning font-medium' : ''}>
                       {item.useByDate ? `Use by: ${new Date(item.useByDate).toLocaleDateString()}` : 
                        item.bestBeforeDate ? `Best before: ${new Date(item.bestBeforeDate).toLocaleDateString()}` : 
                        'No Expiration'}

@@ -74,15 +74,10 @@ export const consumeItemLogic = (foodTypeId: string, state: LocalStorageState): 
   // Clone the object before mutating
   const consumedItem = { ...itemToConsume, quantity: itemToConsume.quantity - 1 };
 
-  // If quantity reaches 0, delete the item
-  if (consumedItem.quantity <= 0) {
-    newState.items = newState.items.filter(item => item.id !== consumedItem.id);
-  } else {
-    // Update the item in the array
-    const index = newState.items.findIndex(item => item.id === consumedItem.id);
-    if (index !== -1) {
-      newState.items[index] = consumedItem;
-    }
+  // Update the item in the array (set quantity to 0 instead of deleting)
+  const index = newState.items.findIndex(item => item.id === consumedItem.id);
+  if (index !== -1) {
+    newState.items[index] = consumedItem;
   }
 
   return newState;

@@ -13,50 +13,27 @@ const Dashboard = () => {
   const allTags = useMemo(() => {
     const tags = new Set<string>();
     state.foodTypes.forEach(ft => ft.tags.forEach(t => tags.add(t)));
-    return Array.from(tags).sort();
+    const sortedTags = Array.from(tags).sort();
+    return [...sortedTags, 'Missing Items'];
   }, [state.foodTypes]);
 
   const dashboardData = useMemo(() => {
-    const mappedFoodTypes = state.foodTypes
-      .filter(ft => !tagFilter || ft.tags.includes(tagFilter))
+    const allMapped = state.foodTypes
       .map(ft => {
         const items = state.items.filter(item => item.foodTypeId === ft.id && item.quantity > 0);
         
         const totalBaseAmount = items.reduce((sum, item) => sum + (item.baseAmount * item.quantity), 0);
-        const totalValue = items.reduce((sum, item) => sum + (item.price || 0), 0);
+        const totalValue = items.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
         
         const survival = calculateSurvival(totalBaseAmount, ft.weeklyConsumptionRate);
         
-        // Find best before range
-        let soonestExp = Infinity;
-        let latestExp = -Infinity;
-        let hasExp = false;
-        
-        // Determine worst case expiration status
         let worstStatus: string = 'GREEN';
-
         items.forEach(item => {
-          const expDate = item.useByDate || item.bestBeforeDate;
-          if (expDate) {
-            hasExp = true;
-            const t = new Date(expDate).getTime();
-            if (t < soonestExp) soonestExp = t;
-            if (t > latestExp) latestExp = t;
-
-            const status = getExpirationStatus(item.useByDate, item.bestBeforeDate);
-            if (status === 'RED') worstStatus = 'RED';
-            else if (status === 'YELLOW' && worstStatus !== 'RED') worstStatus = 'YELLOW';
-          }
+          const status = getExpirationStatus(item.useByDate, item.bestBeforeDate);
+          if (status === 'RED') worstStatus = 'RED';
+          else if (status === 'YELLOW' && worstStatus !== 'RED') worstStatus = 'YELLOW';
         });
 
-        const formatDate = (ms: number) => new Date(ms).toLocaleDateString();
-        const expRange = hasExp 
-          ? soonestExp === latestExp 
-            ? formatDate(soonestExp) 
-            : `${formatDate(soonestExp)} - ${formatDate(latestExp)}`
-          : 'No Expiration Info';
-
-        // Assume all items of a foodType share the same unit for display
         const unit = items.length > 0 ? items[0].unitType : 'unit';
 
         return {
@@ -65,71 +42,64 @@ const Dashboard = () => {
           unit,
           totalValue,
           survival,
-          expRange,
           worstStatus,
           itemCount: items.length
         };
       });
 
-    // Handle orphan items
-    const validFoodTypeIds = new Set(state.foodTypes.map(ft => ft.id));
-    const orphanItems = state.items.filter(item => item.quantity > 0 && !validFoodTypeIds.has(item.foodTypeId));
-    
-    if (orphanItems.length > 0 && !tagFilter) {
-      const orphansGrouped = new Map<string, Item[]>();
-      orphanItems.forEach(item => {
-        const arr = orphansGrouped.get(item.foodTypeId) || [];
-        arr.push(item);
-        orphansGrouped.set(item.foodTypeId, arr);
-      });
+    // Handle orphan items (only for "All Tags" view)
+    if (!tagFilter) {
+      const validFoodTypeIds = new Set(state.foodTypes.map(ft => ft.id));
+      const orphanItems = state.items.filter(item => item.quantity > 0 && !validFoodTypeIds.has(item.foodTypeId));
       
-      orphansGrouped.forEach((items, foodTypeId) => {
-        const totalBaseAmount = items.reduce((sum, item) => sum + (item.baseAmount * item.quantity), 0);
-        const totalValue = items.reduce((sum, item) => sum + (item.price || 0), 0);
+      if (orphanItems.length > 0) {
+        const orphansGrouped = new Map<string, Item[]>();
+        orphanItems.forEach(item => {
+          const arr = orphansGrouped.get(item.foodTypeId) || [];
+          arr.push(item);
+          orphansGrouped.set(item.foodTypeId, arr);
+        });
         
-        let soonestExp = Infinity;
-        let latestExp = -Infinity;
-        let hasExp = false;
-        let worstStatus = 'GREEN';
-
-        items.forEach(item => {
-          const expDate = item.useByDate || item.bestBeforeDate;
-          if (expDate) {
-            hasExp = true;
-            const t = new Date(expDate).getTime();
-            if (t < soonestExp) soonestExp = t;
-            if (t > latestExp) latestExp = t;
-
+        orphansGrouped.forEach((items, foodTypeId) => {
+          const totalBaseAmount = items.reduce((sum, item) => sum + (item.baseAmount * item.quantity), 0);
+          const totalValue = items.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+          let worstStatus = 'GREEN';
+          items.forEach(item => {
             const status = getExpirationStatus(item.useByDate, item.bestBeforeDate);
             if (status === 'RED') worstStatus = 'RED';
             else if (status === 'YELLOW' && worstStatus !== 'RED') worstStatus = 'YELLOW';
-          }
+          });
+
+          allMapped.push({
+            id: foodTypeId,
+            name: items[0].name + " (Uncategorized)",
+            tags: ["Uncategorized"],
+            weeklyConsumptionRate: 0,
+            totalBaseAmount,
+            unit: items[0].unitType,
+            totalValue,
+            survival: null,
+            worstStatus,
+            itemCount: items.length
+          } as any);
         });
-
-        const formatDate = (ms: number) => new Date(ms).toLocaleDateString();
-        const expRange = hasExp 
-          ? soonestExp === latestExp 
-            ? formatDate(soonestExp) 
-            : `${formatDate(soonestExp)} - ${formatDate(latestExp)}`
-          : 'No Expiration Info';
-
-        mappedFoodTypes.push({
-          id: foodTypeId,
-          name: items[0].name + " (Uncategorized)",
-          tags: ["Uncategorized"],
-          weeklyConsumptionRate: 0,
-          totalBaseAmount,
-          unit: items[0].unitType,
-          totalValue,
-          survival: null,
-          expRange,
-          worstStatus,
-          itemCount: items.length
-        } as any);
-      });
+      }
     }
 
-    return mappedFoodTypes.filter(data => data.itemCount > 0);
+    let filtered = allMapped;
+    if (tagFilter === 'Missing Items') {
+      filtered = allMapped.filter(data => data.itemCount === 0 && data.id !== 'Uncategorized');
+    } else if (tagFilter) {
+      filtered = allMapped.filter(data => data.itemCount > 0 && data.tags.includes(tagFilter));
+    } else {
+      filtered = allMapped.filter(data => data.itemCount > 0);
+    }
+
+    return filtered.sort((a, b) => {
+      const daysA = a.survival?.days ?? Infinity;
+      const daysB = b.survival?.days ?? Infinity;
+      return daysA - daysB;
+    });
   }, [state, tagFilter]);
 
   return (
@@ -150,68 +120,56 @@ const Dashboard = () => {
       </div>
 
       {/* List */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {dashboardData.length === 0 ? (
           <div className="text-center py-10 bg-white rounded-xl shadow-sm border border-slate-200">
-            <p className="text-slate-500">No stock found.</p>
+            <p className="text-slate-500">{tagFilter === 'Missing Items' ? 'No missing items found.' : 'No stock found.'}</p>
           </div>
         ) : (
           dashboardData.map(data => (
             <div 
               key={data.id}
               onClick={() => navigate(`/food/${data.id}`)}
-              className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer active:scale-[0.98] transition-transform flex flex-col relative overflow-hidden"
+              className="bg-white p-3 rounded-xl shadow-sm border border-slate-200 cursor-pointer active:scale-[0.98] transition-transform flex flex-col relative overflow-hidden"
             >
               {data.worstStatus === 'RED' && (
-                <div className="absolute top-0 right-0 w-2 h-full bg-danger"></div>
+                <div className="absolute top-0 right-0 w-1.5 h-full bg-danger"></div>
               )}
               {data.worstStatus === 'YELLOW' && (
-                <div className="absolute top-0 right-0 w-2 h-full bg-warning"></div>
+                <div className="absolute top-0 right-0 w-1.5 h-full bg-warning"></div>
               )}
 
-              <div className="flex justify-between items-start pr-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900">{data.name}</h3>
+              <div className="flex justify-between items-center pr-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-semibold text-slate-900 truncate">
+                      {data.name}
+                      {data.survival && <span className="text-primary ml-1.5">— {data.survival.label}</span>}
+                    </h3>
+                    {data.worstStatus !== 'GREEN' && (
+                      <AlertTriangle size={14} className={data.worstStatus === 'RED' ? 'text-danger' : 'text-warning'} />
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {data.tags.map(tag => {
                       const colors = getTagColor(tag);
                       return (
-                        <span key={tag} className={`px-2 py-0.5 text-xs rounded-full border ${colors.bg} ${colors.text} ${colors.border}`}>
+                        <span key={tag} className={`px-1.5 py-0 text-[10px] rounded-full border ${colors.bg} ${colors.text} ${colors.border}`}>
                           {tag}
                         </span>
                       );
                     })}
                   </div>
                 </div>
-                <ChevronRight className="text-slate-400 mt-1" />
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-y-2 text-sm">
-                <div>
-                  <span className="text-slate-500">Total:</span>{' '}
-                  <span className="font-medium">{formatBaseAmount(data.totalBaseAmount, data.unit)}</span>
-                </div>
-                {data.totalValue > 0 && (
-                  <div>
-                    <span className="text-slate-500">Value:</span>{' '}
-                    <span className="font-medium">${data.totalValue.toFixed(2)}</span>
+                <div className="flex items-center gap-3 shrink-0 ml-2">
+                  <div className="text-right">
+                    <div className="text-sm font-bold text-slate-900">{formatBaseAmount(data.totalBaseAmount, data.unit)}</div>
+                    {data.totalValue > 0 && (
+                      <div className="text-[11px] text-slate-500">${data.totalValue.toFixed(2)}</div>
+                    )}
                   </div>
-                )}
-                <div className="col-span-2 flex items-center">
-                  <span className="text-slate-500 mr-1">Exp:</span>{' '}
-                  <span className={`font-medium flex items-center gap-1 ${data.worstStatus === 'RED' ? 'text-danger' : data.worstStatus === 'YELLOW' ? 'text-warning' : ''}`}>
-                    {data.expRange}
-                    {data.worstStatus === 'RED' && <AlertTriangle size={14} />}
-                  </span>
+                  <ChevronRight size={18} className="text-slate-300" />
                 </div>
-                {data.survival && (
-                  <div className="col-span-2 mt-2 pt-2 border-t border-slate-100">
-                    <span className="text-slate-500">Survival:</span>{' '}
-                    <span className="font-semibold text-primary">
-                      {data.survival.days} Days ({data.survival.weeks} Weeks)
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
           ))

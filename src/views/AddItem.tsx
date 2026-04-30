@@ -367,7 +367,7 @@ const AddItem = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Total Price Paid ($)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Price per Quantity ($)</label>
             <input
               type="number"
               step="0.01"

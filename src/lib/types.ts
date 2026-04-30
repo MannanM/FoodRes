@@ -2,7 +2,8 @@ export type UnitType = 'g' | 'ml' | 'unit';
 
 export interface PriceLog {
   id: string;
-  upc: string;
+  upc?: string;
+  name?: string;
   price: number;
   baseAmount: number;
   unitType?: UnitType;

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, Settings as SettingsIcon, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Settings as SettingsIcon, TrendingUp, Info } from 'lucide-react';
 import { StateProvider } from './context/StateContext';
 import Dashboard from './views/Dashboard';
 import AddItem from './views/AddItem';
@@ -8,6 +8,7 @@ import FoodTypeDetail from './views/FoodTypeDetail';
 import EditItem from './views/EditItem';
 import EditFoodType from './views/EditFoodType';
 import LogPrice from './views/LogPrice';
+import About from './views/About';
 import { ReloadPrompt } from './components/ReloadPrompt';
 
 const Navigation = () => {
@@ -26,8 +27,7 @@ const Navigation = () => {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                isActive ? 'text-primary' : 'text-slate-500 hover:text-slate-900'
+              `flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${isActive ? 'text-primary' : 'text-slate-500 hover:text-slate-900'
               }`
             }
           >
@@ -46,8 +46,20 @@ const App = () => {
       <Router>
         <div className="min-h-screen pb-20 bg-slate-50">
           <header className="bg-primary text-white shadow-md sticky top-0 z-10 pt-safe">
-            <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-center">
-              <h1 className="text-xl font-bold tracking-tight">FoodRes.MannanLive.com</h1>
+            <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between gap-2">
+              <NavLink to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <img src="/pwa-512x512.png" alt="FoodRes" className="w-8 h-8 rounded-lg shadow-sm" />
+                <h1 className="text-xl font-bold tracking-tight">FoodRes</h1>
+              </NavLink>
+              <NavLink
+                to="/about"
+                className={({ isActive }) =>
+                  `p-2 rounded-full transition-colors ${isActive ? 'bg-white/20' : 'hover:bg-white/10'}`
+                }
+                title="About FoodRes"
+              >
+                <Info size={20} />
+              </NavLink>
             </div>
           </header>
 
@@ -60,6 +72,7 @@ const App = () => {
               <Route path="/edit-item/:id" element={<EditItem />} />
               <Route path="/edit-food-type/:id" element={<EditFoodType />} />
               <Route path="/log-price" element={<LogPrice />} />
+              <Route path="/about" element={<About />} />
             </Routes>
           </main>
 

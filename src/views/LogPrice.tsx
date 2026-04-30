@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useStateContext } from '../context/StateContext';
 import { Scanner } from '../components/Scanner';
-import { Camera, Search, Save, ArrowLeft } from 'lucide-react';
+import { Camera, Search, Save, ArrowLeft, Wallet, ShoppingBag } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { useMemo } from 'react';
 import type { PriceLog, UnitType } from '../lib/types';
 
 const LogPrice = () => {
@@ -12,6 +13,13 @@ const LogPrice = () => {
   const prefilled = location.state as { upc?: string, name?: string, baseAmount?: number, unitType?: UnitType } | null;
 
   const { state, addPriceLog } = useStateContext();
+
+  const reserveStats = useMemo(() => {
+    const activeItems = state.items.filter(i => i.quantity > 0);
+    const totalValue = activeItems.reduce((sum, i) => sum + ((i.price || 0) * i.quantity), 0);
+    const totalCount = activeItems.reduce((sum, i) => sum + i.quantity, 0);
+    return { totalValue, totalCount };
+  }, [state.items]);
 
   const [showScanner, setShowScanner] = useState(false);
   const [upc, setUpc] = useState(prefilled?.upc || '');
@@ -96,8 +104,8 @@ const LogPrice = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!upc) {
-      alert("UPC is required to log a market price.");
+    if (!upc && !name) {
+      alert("Please provide either a UPC Barcode or a Product Name.");
       return;
     }
 
@@ -114,7 +122,8 @@ const LogPrice = () => {
 
     const newLog: PriceLog = {
       id: uuidv4(),
-      upc,
+      upc: upc || undefined,
+      name: name || undefined,
       price: Number(price),
       baseAmount,
       unitType,
@@ -138,7 +147,25 @@ const LogPrice = () => {
       {showScanner ? (
         <Scanner onResult={handleScan} onCancel={() => setShowScanner(false)} />
       ) : (
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <div className="space-y-4">
+          <div className="bg-slate-900 rounded-2xl p-5 text-white shadow-xl flex items-center justify-between overflow-hidden relative">
+            <div className="relative z-10">
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Total Reserve Value</p>
+              <h3 className="text-3xl font-black text-white flex items-baseline gap-1">
+                <span className="text-primary text-xl">$</span>
+                {reserveStats.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </h3>
+              <div className="flex items-center gap-2 mt-3 text-slate-400 text-sm">
+                <ShoppingBag size={14} className="text-primary" />
+                <span>{reserveStats.totalCount} items in stock</span>
+              </div>
+            </div>
+            <div className="absolute -right-4 -bottom-4 opacity-10">
+              <Wallet size={120} strokeWidth={1} />
+            </div>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
           <form onSubmit={handleSubmit} className="space-y-4">
             
             <div className="flex space-x-2">
@@ -173,16 +200,24 @@ const LogPrice = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border-slate-300 border p-2 text-slate-900 focus:ring-primary focus:border-primary"
-                required
-              />
-            </div>
+            {name && (prefilled?.name || upc) ? (
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Identified Product</label>
+                <div className="text-slate-900 font-semibold">{name}</div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-lg border-slate-300 border p-2 text-slate-900 focus:ring-primary focus:border-primary"
+                  placeholder="Required if no UPC"
+                  required={!upc}
+                />
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -233,6 +268,7 @@ const LogPrice = () => {
             </button>
           </form>
         </div>
+      </div>
       )}
     </div>
   );

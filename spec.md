@@ -92,3 +92,23 @@ When a user scans a barcode (or manually types a UPC and clicks "Lookup"), imple
   - Auto-fill these fields in the Add Item form so the user can review and save.
 - Step 5: Handle errors gracefully (e.g., if API times out or product is not in the database, alert the user to enter details manually).
 
+10. Compact Dashboard & Survival Metrics:
+- Optimize the Dashboard for maximum density. Move the "Survival" metric directly into the FoodType title (e.g., "Rice Bubbles — 9w").
+- Implement concise survival labels: Days (d) for < 14 days, Weeks (w) for < 2 months, Months (m) for < 2 years, and Years (y) for long-term reserves.
+- Automatically sort the Dashboard by shortest survival first to prioritize replenishment needs.
+
+11. Market Tracking & Financial Analysis:
+- Log Market Price: Allow users to log current store prices for products (via UPC or Name) to track inflation without adding new stock.
+- Replacement Cost Analysis: In the detail view, compare the "Total Paid" for current stock vs. its "Current Market Value" to visualize cost savings.
+- Total Reserve Value: Display the cumulative dollar value of the entire inventory on the Market page.
+
+12. UX, Navigation & Data Integrity:
+- Persistent History: Items are NOT deleted when quantity reaches zero. Instead, they remain in the FoodType detail view with "Out of Stock" (ghosted) styling to preserve purchase history, UPC links, and images.
+- Missing Items Filter: A virtual "Missing Items" tag on the Dashboard to quickly identify out-of-stock food groups.
+- Simplified Branding: Header shows "FoodRes" with an icon and serves as a global link back to the Dashboard.
+- About Page: An integrated guide explaining app features, privacy (local-only storage), and FIFO logic.
+- Advanced Tag Colors: A deterministic color generator using an expanded palette (18+ colors) for better visual grouping.
+- Clean Storage: A maintenance tool in Settings to permanently purge zero-quantity items and empty food types.
+- Pricing Logic: All price fields represent the "Price per Quantity unit," ensuring accurate total value and replacement cost calculations.
+
+

@@ -33,10 +33,23 @@ export function formatBaseAmount(amount: number, unit: string) {
 export function calculateSurvival(totalBaseAmount: number, weeklyConsumptionRate: number) {
   if (!weeklyConsumptionRate || weeklyConsumptionRate <= 0) return null;
   const weeks = totalBaseAmount / weeklyConsumptionRate;
-  const days = weeks * 7;
+  const days = Math.floor(weeks * 7);
+  
+  let label = '';
+  if (days < 14) {
+    label = `${days}d`;
+  } else if (days < 60) {
+    label = `${Math.floor(weeks)}w`;
+  } else if (days < 730) {
+    label = `${Math.floor(days / 30.44)}m`;
+  } else {
+    label = `${(days / 365.25).toFixed(1)}y`;
+  }
+
   return {
-    days: Math.floor(days),
-    weeks: +(weeks).toFixed(1)
+    days,
+    weeks: +weeks.toFixed(1),
+    label
   };
 }
 
@@ -52,6 +65,14 @@ export function getTagColor(tag: string) {
     { bg: 'bg-fuchsia-100', text: 'text-fuchsia-700', border: 'border-fuchsia-200' },
     { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-200' },
     { bg: 'bg-teal-100', text: 'text-teal-700', border: 'border-teal-200' },
+    { bg: 'bg-lime-100', text: 'text-lime-700', border: 'border-lime-200' },
+    { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-200' },
+    { bg: 'bg-sky-100', text: 'text-sky-700', border: 'border-sky-200' },
+    { bg: 'bg-pink-100', text: 'text-pink-700', border: 'border-pink-200' },
+    { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-200' },
+    { bg: 'bg-slate-200', text: 'text-slate-700', border: 'border-slate-300' },
+    { bg: 'bg-stone-200', text: 'text-stone-700', border: 'border-stone-300' },
+    { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-200' },
   ];
   
   let hash = 0;
