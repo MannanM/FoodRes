@@ -88,11 +88,19 @@ export const StateProvider: FC<{ children: ReactNode }> = ({ children }) => {
       const itemsWithQuantity = prev.items.filter(item => item.quantity > 0);
       const activeFoodTypeIds = new Set(itemsWithQuantity.map(item => item.foodTypeId));
       const activeFoodTypes = prev.foodTypes.filter(ft => activeFoodTypeIds.has(ft.id));
-      
+
+      const activeUpcs = new Set(itemsWithQuantity.map(i => i.upc).filter(Boolean));
+      const activeNames = new Set(itemsWithQuantity.map(i => i.name));
+
+      const activePriceLogs = (prev.priceLogs || []).filter(log =>
+        (log.upc && activeUpcs.has(log.upc!)) || (log.name && activeNames.has(log.name))
+      );
+
       return {
         ...prev,
         items: itemsWithQuantity,
-        foodTypes: activeFoodTypes
+        foodTypes: activeFoodTypes,
+        priceLogs: activePriceLogs
       };
     });
   };
@@ -102,9 +110,9 @@ export const StateProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   return (
-    <StateContext.Provider value={{ 
-      state, addFoodType, updateFoodType, deleteFoodType, 
-      addItem, updateItem, deleteItem, consumeItem, addPriceLog, cleanStorage, overwriteState 
+    <StateContext.Provider value={{
+      state, addFoodType, updateFoodType, deleteFoodType,
+      addItem, updateItem, deleteItem, consumeItem, addPriceLog, cleanStorage, overwriteState
     }}>
       {children}
     </StateContext.Provider>

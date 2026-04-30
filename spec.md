@@ -108,7 +108,7 @@ When a user scans a barcode (or manually types a UPC and clicks "Lookup"), imple
 - Simplified Branding: Header shows "FoodRes" with an icon and serves as a global link back to the Dashboard.
 - About Page: An integrated guide explaining app features, privacy (local-only storage), and FIFO logic.
 - Advanced Tag Colors: A deterministic color generator using an expanded palette (18+ colors) for better visual grouping.
-- Clean Storage: A maintenance tool in Settings to permanently purge zero-quantity items and empty food types.
+- Clean Storage: A maintenance tool in Settings to permanently purge zero-quantity items, empty food types, and price logs no longer associated with active stock.
 - Pricing Logic: All price fields represent the "Price per Quantity unit," ensuring accurate total value and replacement cost calculations.
 
 

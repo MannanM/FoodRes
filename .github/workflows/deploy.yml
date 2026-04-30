@@ -36,4 +36,6 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 sync dist/ s3://foodres.mannanlive.com --delete --quiet --size-only
+          aws s3 sync dist/ s3://foodres.mannanlive.com --exclude "index.html" --delete --quiet --size-only
+          aws s3 cp ./dist/index.html s3://foodres.mannanlive.com/index.html --cache-control "no-cache, no-store, must-revalidate"
+
