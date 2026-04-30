@@ -7,13 +7,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'favicon.png', 'apple-touch-icon.png', 'masked-icon.svg'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
         cleanupOutdatedCaches: true,
       },
       manifest: {
-        name: 'FoodRes.click',
+        name: 'FoodRes.MannanLive.com',
         short_name: 'FoodRes',
         description: 'Household Food Reserves Manager',
         theme_color: '#ffffff',

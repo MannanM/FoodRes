@@ -47,7 +47,7 @@ const App = () => {
         <div className="min-h-screen pb-20 bg-slate-50">
           <header className="bg-primary text-white shadow-md sticky top-0 z-10 pt-safe">
             <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-center">
-              <h1 className="text-xl font-bold tracking-tight">FoodRes.click</h1>
+              <h1 className="text-xl font-bold tracking-tight">FoodRes.MannanLive.com</h1>
             </div>
           </header>
 

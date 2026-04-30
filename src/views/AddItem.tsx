@@ -32,6 +32,7 @@ const AddItem = () => {
   const [bestBeforeDate, setBestBeforeDate] = useState('');
   const [useByDate, setUseByDate] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [batchNumber, setBatchNumber] = useState('');
 
   const handleLookup = async (code: string) => {
     if (!code) return;
@@ -158,6 +159,7 @@ const AddItem = () => {
       bestBeforeDate: bestBeforeDate ? new Date(bestBeforeDate).toISOString() : null,
       useByDate: useByDate ? new Date(useByDate).toISOString() : null,
       price: price ? Number(price) : null,
+      batchNumber: batchNumber || null,
       upc: upc || null,
       imageUrl: imageUrl || null
     };
@@ -206,7 +208,9 @@ const AddItem = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Food Type Group</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Food Type Group <span className="text-danger">*</span>
+            </label>
             {state.foodTypes.length > 0 && !isNewFoodType ? (
               <div className="flex space-x-2">
                 <select 
@@ -253,7 +257,9 @@ const AddItem = () => {
                   className="w-full rounded-lg border-slate-300 border p-2"
                 />
                 <div>
-                  <label className="block text-xs text-slate-500 mb-1">Consumption Rate (Base Units)</label>
+                  <label className="block text-xs text-slate-500 mb-1">
+                    Consumption Rate (Base Units) <span className="text-danger">*</span>
+                  </label>
                   <div className="flex space-x-2">
                     <input
                       type="number"
@@ -282,7 +288,9 @@ const AddItem = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Specific Item Name</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Specific Item Name <span className="text-danger">*</span>
+            </label>
             <input
               type="text"
               value={name}
@@ -295,7 +303,9 @@ const AddItem = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Amount per Unit</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Amount per Unit <span className="text-danger">*</span>
+              </label>
               <div className="flex">
                 <input
                   type="number"
@@ -320,7 +330,9 @@ const AddItem = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Quantity <span className="text-danger">*</span>
+              </label>
               <input
                 type="number"
                 min="1"
@@ -344,6 +356,17 @@ const AddItem = () => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Batch Number</label>
+            <input
+              type="text"
+              value={batchNumber}
+              onChange={(e) => setBatchNumber(e.target.value)}
+              className="w-full rounded-lg border-slate-300 border p-2 text-slate-900"
+              placeholder="Optional"
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Total Price Paid ($)</label>
             <input
               type="number"
@@ -357,7 +380,9 @@ const AddItem = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Purchase Date</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Purchase Date <span className="text-danger">*</span>
+            </label>
             <input
               type="date"
               value={purchaseDate}

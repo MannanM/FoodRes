@@ -1,73 +1,63 @@
-# React + TypeScript + Vite
+# FoodRes.MannanLive.com
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A powerful PWA (Progressive Web App) for tracking food inventory, monitoring shelf-life, and analyzing market inflation. Designed to help you optimize your pantry and save money.
 
-Currently, two official plugins are available:
+## 🚀 Key Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Inventory Management**: Track stock levels with support for multiple units (g, ml, units) and automatic consumption logic.
+- **Expiration Tracking**: Visual status indicators (Red/Yellow/Green) for items nearing their best-before or use-by dates.
+- **Inflation Analytics**:
+  - **Market Price Logging**: Scan barcodes to log current shelf prices without adding to inventory.
+  - **Visualizer**: Dual-series charts comparing your purchase prices against current market trends.
+  - **Savings Analysis**: Real-time calculation of your current stock's "replacement value" vs. what you actually paid.
+- **Offline-First**: Fully functional offline using PWA technology and LocalStorage.
+- **Smart Barcode Support**: Integrated UPC lookup via Open Food Facts and local history.
+- **Privacy Focused**: All data stays in your browser. No account required.
+- **Data Portability**: Easy JSON import/export via file or clipboard.
 
-## React Compiler
+## 🛠️ Technology Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework**: React 19 + TypeScript
+- **Build Tool**: Vite 8
+- **Styling**: Tailwind CSS
+- **Charts**: Recharts
+- **PWA**: vite-plugin-pwa
+- **Icons**: Lucide React
 
-## Expanding the ESLint configuration
+## 🏃 Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
+- Node.js (v20 or higher)
+- npm
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Installation
+```bash
+# Clone the repository
+git clone <repository-url>
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Navigate to directory
+cd food-res
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Install dependencies
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Running Locally
+```bash
+# Start the dev server
+npm run dev
 ```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Building for Production
+```bash
+# Build the production assets
+npm run build
+```
+The output will be in the `dist/` directory.
+
+## 🚢 Deployment
+This project includes a GitHub Action (`.github/workflows/deploy.yml`) that automatically builds and deploys the site to an S3 bucket (`foodres.mannanlive.com`) on every push to the `main` branch.
+
+## 🧹 Maintenance
+Use the **Clean Storage** option in Settings to quickly prune items with 0 quantity and empty food groups.

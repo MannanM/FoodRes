@@ -22,6 +22,7 @@ const EditItem = () => {
   const [useByDate, setUseByDate] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [upc, setUpc] = useState('');
+  const [batchNumber, setBatchNumber] = useState('');
 
   useEffect(() => {
     const foundItem = state.items.find(i => i.id === id);
@@ -35,6 +36,7 @@ const EditItem = () => {
       setUseByDate(foundItem.useByDate ? new Date(foundItem.useByDate).toISOString().split('T')[0] : '');
       setImageUrl(foundItem.imageUrl || '');
       setUpc(foundItem.upc || '');
+      setBatchNumber(foundItem.batchNumber || '');
 
       // De-normalize baseAmount back to UI
       if (foundItem.unitType === 'g' && foundItem.baseAmount >= 1000) {
@@ -83,6 +85,7 @@ const EditItem = () => {
       bestBeforeDate: bestBeforeDate ? new Date(bestBeforeDate).toISOString() : null,
       useByDate: useByDate ? new Date(useByDate).toISOString() : null,
       price: price ? Number(price) : null,
+      batchNumber: batchNumber || null,
       upc: upc || null,
       imageUrl: imageUrl || null
     };
@@ -114,7 +117,9 @@ const EditItem = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Item Name</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Item Name <span className="text-danger">*</span>
+            </label>
             <input
               type="text"
               value={name}
@@ -126,7 +131,9 @@ const EditItem = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Amount per Unit</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Amount per Unit <span className="text-danger">*</span>
+              </label>
               <div className="flex space-x-2">
                 <input
                   type="number"
@@ -152,7 +159,9 @@ const EditItem = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Quantity <span className="text-danger">*</span>
+              </label>
               <input
                 type="number"
                 min="1"
@@ -187,6 +196,17 @@ const EditItem = () => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Batch Number</label>
+            <input
+              type="text"
+              value={batchNumber}
+              onChange={(e) => setBatchNumber(e.target.value)}
+              className="w-full rounded-lg border-slate-300 border p-2 text-slate-900 focus:ring-primary focus:border-primary"
+              placeholder="Optional"
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Total Price Paid ($)</label>
             <input
               type="number"
@@ -200,7 +220,9 @@ const EditItem = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Purchase Date</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Purchase Date <span className="text-danger">*</span>
+            </label>
             <input
               type="date"
               value={purchaseDate}

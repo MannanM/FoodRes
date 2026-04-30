@@ -1,6 +1,6 @@
 import { useRef, type ChangeEvent } from 'react';
 import { exportData, importData, saveState } from '../lib/storage';
-import { Download, Upload, Copy, ClipboardPaste, FileText, Eraser } from 'lucide-react';
+import { Download, Upload, Copy, ClipboardPaste, FileText, Eraser, Code } from 'lucide-react';
 import { exampleData } from '../lib/exampleData';
 import { useStateContext } from '../context/StateContext';
 
@@ -141,8 +141,18 @@ const Settings = () => {
             <Eraser size={20} /> Clean Storage
           </button>
           
-          <div className="mt-8 pt-6 border-t border-slate-100 text-sm text-slate-500 text-center">
+          <div className="mt-8 pt-6 border-t border-slate-100 text-sm text-slate-500 text-center space-y-4">
             <p>FoodRes stores all data locally in your browser. Clearing your browser data will wipe your inventory. Always keep a backup!</p>
+            <div className="flex justify-center pt-2">
+              <a 
+                href="https://github.com/MannanM/FoodRes" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-primary hover:underline font-medium"
+              >
+                <Code size={18} /> Open Source Code
+              </a>
+            </div>
           </div>
         </div>
       </div>
