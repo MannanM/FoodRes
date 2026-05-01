@@ -231,9 +231,12 @@ export const combinedExampleData = {
         "name": "Low-dose Naltrexone",
         "baseUnit": "mg",
         "scheduleDose": {
+          "wakeup": 0,
           "morning": 0.2,
           "midday": 0,
-          "night": 0
+          "afternoon": 0,
+          "night": 0,
+          "beforeBed": 0
         },
         "scriptRepeatsRemaining": 5,
         "scriptExpiryDate": "2026-10-28T00:00:00.000Z",
@@ -244,9 +247,12 @@ export const combinedExampleData = {
         "name": "Psyllium Husk",
         "baseUnit": "g",
         "scheduleDose": {
+          "wakeup": 0,
           "morning": 5,
           "midday": 0,
-          "night": 5
+          "afternoon": 0,
+          "night": 5,
+          "beforeBed": 0
         },
         "lastStockTakeDate": "2026-05-01"
       }

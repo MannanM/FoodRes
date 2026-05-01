@@ -1,9 +1,12 @@
 export type MedBaseUnit = 'mg' | 'g' | 'ml' | 'unit/tablet';
 
 export interface MedicationSchedule {
-  morning: number;
-  midday: number;
-  night: number;
+  wakeup?: number;
+  morning?: number;
+  midday?: number;
+  afternoon?: number;
+  night?: number;
+  beforeBed?: number;
 }
 
 export interface MedicationProfile {

@@ -20,7 +20,12 @@ export const saveMedsState = (state: MedsData) => {
 };
 
 export const calculateMedsMetrics = (med: MedicationProfile, batches: MedInventoryBatch[]) => {
-  const dailyNeed = med.scheduleDose.morning + med.scheduleDose.midday + med.scheduleDose.night;
+  const dailyNeed = (med.scheduleDose.wakeup || 0) + 
+                    (med.scheduleDose.morning || 0) + 
+                    (med.scheduleDose.midday || 0) + 
+                    (med.scheduleDose.afternoon || 0) + 
+                    (med.scheduleDose.night || 0) + 
+                    (med.scheduleDose.beforeBed || 0);
   
   const totalPool = batches
     .filter(b => b.medicationId === med.id)

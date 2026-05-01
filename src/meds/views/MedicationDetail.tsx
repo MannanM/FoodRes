@@ -70,7 +70,7 @@ const MedicationDetail = () => {
         <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
           <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">Estimated Stock</p>
           <p className="text-xl font-bold text-slate-800">
-            {metrics.currentEstimatedInventory.toFixed(1)} <span className="text-sm font-normal text-slate-500">{med.baseUnit}</span>
+            {metrics.daysRemaining === Infinity ? '0.0' : metrics.daysRemaining.toFixed(1)} <span className="text-sm font-normal text-slate-500">doses</span>
           </p>
         </div>
         <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
@@ -87,19 +87,73 @@ const MedicationDetail = () => {
           <Clock size={18} className="text-blue-600" />
           Active Schedule
         </h3>
-        <div className="flex justify-between text-sm">
-          <div className="text-center">
-            <p className="text-slate-400 font-bold uppercase text-[10px]">Morning</p>
-            <p className="font-bold text-slate-700">{med.scheduleDose.morning} {med.baseUnit}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-slate-400 font-bold uppercase text-[10px]">Midday</p>
-            <p className="font-bold text-slate-700">{med.scheduleDose.midday} {med.baseUnit}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-slate-400 font-bold uppercase text-[10px]">Night</p>
-            <p className="font-bold text-slate-700">{med.scheduleDose.night} {med.baseUnit}</p>
-          </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {med.scheduleDose.wakeup ? (
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-4">
+              <div className="bg-sky-100 p-2 rounded-lg text-sky-600">
+                <Clock size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400">Wake-up</p>
+                <p className="font-bold text-slate-800">{med.scheduleDose.wakeup} {med.baseUnit}</p>
+              </div>
+            </div>
+          ) : null}
+          {med.scheduleDose.morning ? (
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-4">
+              <div className="bg-amber-100 p-2 rounded-lg text-amber-600">
+                <Clock size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400">Morning</p>
+                <p className="font-bold text-slate-800">{med.scheduleDose.morning} {med.baseUnit}</p>
+              </div>
+            </div>
+          ) : null}
+          {med.scheduleDose.midday ? (
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-4">
+              <div className="bg-orange-100 p-2 rounded-lg text-orange-600">
+                <Clock size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400">Midday</p>
+                <p className="font-bold text-slate-800">{med.scheduleDose.midday} {med.baseUnit}</p>
+              </div>
+            </div>
+          ) : null}
+          {med.scheduleDose.afternoon ? (
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-4">
+              <div className="bg-orange-100 p-2 rounded-lg text-orange-700">
+                <Clock size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400">Afternoon</p>
+                <p className="font-bold text-slate-800">{med.scheduleDose.afternoon} {med.baseUnit}</p>
+              </div>
+            </div>
+          ) : null}
+          {med.scheduleDose.night ? (
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-4">
+              <div className="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                <Clock size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400">Night</p>
+                <p className="font-bold text-slate-800">{med.scheduleDose.night} {med.baseUnit}</p>
+              </div>
+            </div>
+          ) : null}
+          {med.scheduleDose.beforeBed ? (
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-4">
+              <div className="bg-slate-200 p-2 rounded-lg text-slate-600">
+                <Clock size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-slate-400">Before Bed</p>
+                <p className="font-bold text-slate-800">{med.scheduleDose.beforeBed} {med.baseUnit}</p>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
 

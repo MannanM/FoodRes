@@ -17,9 +17,12 @@ const AddEditMedication = () => {
 
   const [name, setName] = useState('');
   const [baseUnit, setBaseUnit] = useState<MedBaseUnit>('mg');
+  const [wakeup, setWakeup] = useState(0);
   const [morning, setMorning] = useState(0);
   const [midday, setMidday] = useState(0);
+  const [afternoon, setAfternoon] = useState(0);
   const [night, setNight] = useState(0);
+  const [beforeBed, setBeforeBed] = useState(0);
   const [repeats, setRepeats] = useState<number | ''>('');
   const [expiry, setExpiry] = useState('');
 
@@ -27,9 +30,12 @@ const AddEditMedication = () => {
     if (isEdit && existingMed) {
       setName(existingMed.name);
       setBaseUnit(existingMed.baseUnit);
-      setMorning(existingMed.scheduleDose.morning);
-      setMidday(existingMed.scheduleDose.midday);
-      setNight(existingMed.scheduleDose.night);
+      setWakeup(existingMed.scheduleDose.wakeup || 0);
+      setMorning(existingMed.scheduleDose.morning || 0);
+      setMidday(existingMed.scheduleDose.midday || 0);
+      setAfternoon(existingMed.scheduleDose.afternoon || 0);
+      setNight(existingMed.scheduleDose.night || 0);
+      setBeforeBed(existingMed.scheduleDose.beforeBed || 0);
       setRepeats(existingMed.scriptRepeatsRemaining ?? '');
       setExpiry(existingMed.scriptExpiryDate ? existingMed.scriptExpiryDate.split('T')[0] : '');
     }
@@ -39,9 +45,12 @@ const AddEditMedication = () => {
     e.preventDefault();
 
     const scheduleChanged = isEdit && existingMed && (
-      existingMed.scheduleDose.morning !== morning ||
-      existingMed.scheduleDose.midday !== midday ||
-      existingMed.scheduleDose.night !== night
+      (existingMed.scheduleDose.wakeup || 0) !== wakeup ||
+      (existingMed.scheduleDose.morning || 0) !== morning ||
+      (existingMed.scheduleDose.midday || 0) !== midday ||
+      (existingMed.scheduleDose.afternoon || 0) !== afternoon ||
+      (existingMed.scheduleDose.night || 0) !== night ||
+      (existingMed.scheduleDose.beforeBed || 0) !== beforeBed
     );
 
     const today = formatISO(new Date(), { representation: 'date' });
@@ -74,7 +83,7 @@ const AddEditMedication = () => {
       id: id || uuidv4(),
       name,
       baseUnit,
-      scheduleDose: { morning, midday, night },
+      scheduleDose: { wakeup, morning, midday, afternoon, night, beforeBed },
       scriptRepeatsRemaining: repeats === '' ? undefined : Number(repeats),
       scriptExpiryDate: expiry ? new Date(expiry).toISOString() : undefined,
       lastStockTakeDate
@@ -140,7 +149,17 @@ const AddEditMedication = () => {
 
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <h3 className="font-bold text-slate-800 mb-4">Daily Dosage Schedule</h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Wake-up</label>
+              <input
+                type="number"
+                step="any"
+                value={wakeup}
+                onChange={e => setWakeup(Number(e.target.value))}
+                className="w-full p-3 rounded-xl border border-slate-200 outline-none"
+              />
+            </div>
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Morning</label>
               <input
@@ -162,12 +181,32 @@ const AddEditMedication = () => {
               />
             </div>
             <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Afternoon</label>
+              <input
+                type="number"
+                step="any"
+                value={afternoon}
+                onChange={e => setAfternoon(Number(e.target.value))}
+                className="w-full p-3 rounded-xl border border-slate-200 outline-none"
+              />
+            </div>
+            <div>
               <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Night</label>
               <input
                 type="number"
                 step="any"
                 value={night}
                 onChange={e => setNight(Number(e.target.value))}
+                className="w-full p-3 rounded-xl border border-slate-200 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Before Bed</label>
+              <input
+                type="number"
+                step="any"
+                value={beforeBed}
+                onChange={e => setBeforeBed(Number(e.target.value))}
                 className="w-full p-3 rounded-xl border border-slate-200 outline-none"
               />
             </div>

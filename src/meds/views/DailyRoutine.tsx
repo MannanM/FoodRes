@@ -1,25 +1,28 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMedsContext } from '../context/MedsContext';
-import { ArrowLeft, Sunrise, Sun, Moon, Clock } from 'lucide-react';
+import { ArrowLeft, Sunrise, Sun, Moon, Clock, AlarmClock, Coffee, CloudSun, Bed } from 'lucide-react';
 
 const DailyRoutine = () => {
   const { state } = useMedsContext();
   const navigate = useNavigate();
 
   const routine = useMemo(() => {
-    const morning = state.medications.filter(m => m.scheduleDose.morning > 0);
-    const midday = state.medications.filter(m => m.scheduleDose.midday > 0);
-    const night = state.medications.filter(m => m.scheduleDose.night > 0);
+    const wakeup = state.medications.filter(m => (m.scheduleDose.wakeup || 0) > 0);
+    const morning = state.medications.filter(m => (m.scheduleDose.morning || 0) > 0);
+    const midday = state.medications.filter(m => (m.scheduleDose.midday || 0) > 0);
+    const afternoon = state.medications.filter(m => (m.scheduleDose.afternoon || 0) > 0);
+    const night = state.medications.filter(m => (m.scheduleDose.night || 0) > 0);
+    const beforeBed = state.medications.filter(m => (m.scheduleDose.beforeBed || 0) > 0);
 
-    return { morning, midday, night };
+    return { wakeup, morning, midday, afternoon, night, beforeBed };
   }, [state.medications]);
 
   const Section = ({ title, icon: Icon, meds, timeLabel, colorClass }: { 
     title: string, 
     icon: any, 
     meds: typeof state.medications, 
-    timeLabel: 'morning' | 'midday' | 'night',
+    timeLabel: keyof typeof state.medications[0]['scheduleDose'],
     colorClass: string 
   }) => (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -57,27 +60,60 @@ const DailyRoutine = () => {
       </div>
 
       <div className="space-y-4">
-        <Section 
-          title="Morning" 
-          icon={Sunrise} 
-          meds={routine.morning} 
-          timeLabel="morning" 
-          colorClass="bg-amber-500"
-        />
-        <Section 
-          title="Midday" 
-          icon={Sun} 
-          meds={routine.midday} 
-          timeLabel="midday" 
-          colorClass="bg-orange-600"
-        />
-        <Section 
-          title="Night" 
-          icon={Moon} 
-          meds={routine.night} 
-          timeLabel="night" 
-          colorClass="bg-indigo-900"
-        />
+        {routine.wakeup.length > 0 && (
+          <Section 
+            title="Wake-up" 
+            icon={AlarmClock} 
+            meds={routine.wakeup} 
+            timeLabel="wakeup" 
+            colorClass="bg-sky-500"
+          />
+        )}
+        {routine.morning.length > 0 && (
+          <Section 
+            title="Morning" 
+            icon={Coffee} 
+            meds={routine.morning} 
+            timeLabel="morning" 
+            colorClass="bg-amber-500"
+          />
+        )}
+        {routine.midday.length > 0 && (
+          <Section 
+            title="Midday" 
+            icon={Sun} 
+            meds={routine.midday} 
+            timeLabel="midday" 
+            colorClass="bg-orange-500"
+          />
+        )}
+        {routine.afternoon.length > 0 && (
+          <Section 
+            title="Afternoon" 
+            icon={CloudSun} 
+            meds={routine.afternoon} 
+            timeLabel="afternoon" 
+            colorClass="bg-orange-600"
+          />
+        )}
+        {routine.night.length > 0 && (
+          <Section 
+            title="Night" 
+            icon={Moon} 
+            meds={routine.night} 
+            timeLabel="night" 
+            colorClass="bg-indigo-900"
+          />
+        )}
+        {routine.beforeBed.length > 0 && (
+          <Section 
+            title="Before Bed" 
+            icon={Bed} 
+            meds={routine.beforeBed} 
+            timeLabel="beforeBed" 
+            colorClass="bg-slate-900"
+          />
+        )}
       </div>
 
       <div className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex items-start gap-3">

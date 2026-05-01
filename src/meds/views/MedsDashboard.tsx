@@ -75,9 +75,12 @@ const MedsDashboard = () => {
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-sm font-medium text-slate-500 flex items-center gap-1">
                       <Clock size={14} />
-                      {med.scheduleDose.morning > 0 && `${med.scheduleDose.morning}${med.baseUnit} AM `}
-                      {med.scheduleDose.midday > 0 && `${med.scheduleDose.midday}${med.baseUnit} Mid `}
-                      {med.scheduleDose.night > 0 && `${med.scheduleDose.night}${med.baseUnit} PM`}
+                      {med.scheduleDose.wakeup ? `${med.scheduleDose.wakeup}${med.baseUnit} WU ` : ''}
+                      {med.scheduleDose.morning ? `${med.scheduleDose.morning}${med.baseUnit} AM ` : ''}
+                      {med.scheduleDose.midday ? `${med.scheduleDose.midday}${med.baseUnit} Mid ` : ''}
+                      {med.scheduleDose.afternoon ? `${med.scheduleDose.afternoon}${med.baseUnit} PM ` : ''}
+                      {med.scheduleDose.night ? `${med.scheduleDose.night}${med.baseUnit} Night ` : ''}
+                      {med.scheduleDose.beforeBed ? `${med.scheduleDose.beforeBed}${med.baseUnit} Bed` : ''}
                     </span>
                   </div>
                 </div>
@@ -96,7 +99,7 @@ const MedsDashboard = () => {
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                   <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">Current Stock</p>
                   <p className="text-lg font-bold text-slate-700">
-                    {med.metrics.currentEstimatedInventory.toFixed(1)} <span className="text-xs font-normal text-slate-500">{med.baseUnit}</span>
+                    {med.metrics.daysRemaining === Infinity ? '0.0' : med.metrics.daysRemaining.toFixed(1)} <span className="text-xs font-normal text-slate-500">doses</span>
                   </p>
                 </div>
                 <div className={`p-3 rounded-xl border ${getStatusColor(med.metrics.daysRemaining)}`}>
