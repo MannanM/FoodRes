@@ -1,7 +1,7 @@
 import { useRef, type ChangeEvent } from 'react';
-import { exportData, importData, saveState } from '../lib/storage';
+import { exportData, importData } from '../lib/storage';
 import { Download, Upload, Copy, ClipboardPaste, FileText, Eraser, Code } from 'lucide-react';
-import { exampleData } from '../lib/exampleData';
+import { combinedExampleData } from '../lib/exampleData';
 import { useStateContext } from '../context/StateContext';
 
 const Settings = () => {
@@ -69,7 +69,9 @@ const Settings = () => {
 
   const handleLoadExample = () => {
     if (window.confirm('This will OVERWRITE your current data with example data. Are you sure?')) {
-      saveState(exampleData);
+      localStorage.setItem('foodres_state', JSON.stringify(combinedExampleData.foodData));
+      localStorage.setItem('foodres_meds_state', JSON.stringify(combinedExampleData.medsData));
+      
       alert('Example data loaded successfully!');
       window.location.reload();
     }

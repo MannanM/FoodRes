@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, Settings as SettingsIcon, TrendingUp, Info } from 'lucide-react';
+import { LayoutDashboard, Settings as SettingsIcon, TrendingUp, Info, Pill } from 'lucide-react';
 import { StateProvider } from './context/StateContext';
 import Dashboard from './views/Dashboard';
 import AddItem from './views/AddItem';
@@ -10,12 +10,13 @@ import EditFoodType from './views/EditFoodType';
 import LogPrice from './views/LogPrice';
 import About from './views/About';
 import { ReloadPrompt } from './components/ReloadPrompt';
+import MedsModule from './meds/MedsModule';
 
 const Navigation = () => {
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'Stock' },
-    { to: '/add', icon: PlusCircle, label: 'Add Item' },
     { to: '/log-price', icon: TrendingUp, label: 'Market' },
+    { to: '/meds', icon: Pill, label: 'Meds' },
     { to: '/settings', icon: SettingsIcon, label: 'Settings' }
   ];
 
@@ -66,6 +67,7 @@ const App = () => {
           <main className="max-w-md mx-auto p-4 space-y-4">
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/meds/*" element={<MedsModule />} />
               <Route path="/add" element={<AddItem />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/food/:id" element={<FoodTypeDetail />} />

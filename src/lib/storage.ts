@@ -1,37 +1,35 @@
 import type { LocalStorageState } from './types';
 
-const STORAGE_KEY = 'foodres_state';
-
-const getInitialState = (): LocalStorageState => {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch (e) {
-      console.error('Failed to parse localStorage data', e);
-    }
-  }
-  return { foodTypes: [], items: [], priceLogs: [] };
-};
+const FOOD_STORAGE_KEY = 'foodres_state';
+const MEDS_STORAGE_KEY = 'foodres_meds_state';
 
 export const saveState = (state: LocalStorageState) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(FOOD_STORAGE_KEY, JSON.stringify(state));
 };
 
 export const getState = (): LocalStorageState => {
-  return getInitialState();
+  const stored = localStorage.getItem(FOOD_STORAGE_KEY);
+  return stored ? JSON.parse(stored) : { foodTypes: [], items: [], priceLogs: [] };
 };
 
 export const exportData = (): string => {
-  return localStorage.getItem(STORAGE_KEY) || JSON.stringify({ foodTypes: [], items: [], priceLogs: [] });
+  const foodData = localStorage.getItem(FOOD_STORAGE_KEY);
+  const medsData = localStorage.getItem(MEDS_STORAGE_KEY);
+  
+  const combined = {
+    foodData: foodData ? JSON.parse(foodData) : { foodTypes: [], items: [], priceLogs: [] },
+    medsData: medsData ? JSON.parse(medsData) : { medications: [], batches: [] }
+  };
+  
+  return JSON.stringify(combined, null, 2);
 };
 
 export const importData = (jsonData: string): boolean => {
   try {
-    const data = JSON.parse(jsonData) as LocalStorageState;
-    if (Array.isArray(data.foodTypes) && Array.isArray(data.items)) {
-      if (!data.priceLogs) data.priceLogs = [];
-      saveState(data);
+    const data = JSON.parse(jsonData);
+    if (data.foodData && data.medsData) {
+      localStorage.setItem(FOOD_STORAGE_KEY, JSON.stringify(data.foodData));
+      localStorage.setItem(MEDS_STORAGE_KEY, JSON.stringify(data.medsData));
       return true;
     }
     return false;

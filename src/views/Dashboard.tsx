@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStateContext } from '../context/StateContext';
 import { calculateSurvival, formatBaseAmount, getExpirationStatus, getTagColor } from '../lib/utils';
-import { ChevronRight, AlertTriangle } from 'lucide-react';
+import { ChevronRight, AlertTriangle, LayoutDashboard, Plus } from 'lucide-react';
 import type { Item } from '../lib/types';
 
 const Dashboard = () => {
@@ -103,7 +103,20 @@ const Dashboard = () => {
   }, [state, tagFilter]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <LayoutDashboard className="text-blue-600" />
+          Stock
+        </h2>
+        <button
+          onClick={() => navigate('/add')}
+          className="bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus size={24} />
+        </button>
+      </div>
+
       {/* Filters */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <label className="block text-sm font-medium text-slate-700 mb-1">Filter by Tag</label>

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShieldCheck, Zap, TrendingUp, Download, Smartphone } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Zap, TrendingUp, Download, Smartphone, Pill } from 'lucide-react';
 
 const About = () => {
   const navigate = useNavigate();
@@ -24,6 +24,11 @@ const About = () => {
       icon: Download,
       title: 'Data Portability',
       description: 'Export your entire inventory to a JSON file at any time for backups or transferring to other devices.'
+    },
+    {
+      icon: Pill,
+      title: 'Medication Tracking',
+      description: 'Track medication inventory with passive auto-deduction based on your daily dosage schedule.'
     },
     {
       icon: Smartphone,
