@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMedsContext } from '../context/MedsContext';
-import { ArrowLeft, Sunrise, Sun, Moon, Clock, AlarmClock, Coffee, CloudSun, Bed } from 'lucide-react';
+import { ArrowLeft, Sun, Moon, Clock, AlarmClock, Coffee, CloudSun, Bed } from 'lucide-react';
 
 const DailyRoutine = () => {
   const { state } = useMedsContext();
@@ -18,12 +18,12 @@ const DailyRoutine = () => {
     return { wakeup, morning, midday, afternoon, night, beforeBed };
   }, [state.medications]);
 
-  const Section = ({ title, icon: Icon, meds, timeLabel, colorClass }: { 
-    title: string, 
-    icon: any, 
-    meds: typeof state.medications, 
+  const Section = ({ title, icon: Icon, meds, timeLabel, colorClass }: {
+    title: string,
+    icon: any,
+    meds: typeof state.medications,
     timeLabel: keyof typeof state.medications[0]['scheduleDose'],
-    colorClass: string 
+    colorClass: string
   }) => (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className={`p-4 flex items-center gap-3 ${colorClass} text-white`}>
@@ -61,56 +61,56 @@ const DailyRoutine = () => {
 
       <div className="space-y-4">
         {routine.wakeup.length > 0 && (
-          <Section 
-            title="Wake-up" 
-            icon={AlarmClock} 
-            meds={routine.wakeup} 
-            timeLabel="wakeup" 
+          <Section
+            title="Wake-up"
+            icon={AlarmClock}
+            meds={routine.wakeup}
+            timeLabel="wakeup"
             colorClass="bg-sky-500"
           />
         )}
         {routine.morning.length > 0 && (
-          <Section 
-            title="Morning" 
-            icon={Coffee} 
-            meds={routine.morning} 
-            timeLabel="morning" 
+          <Section
+            title="Morning"
+            icon={Coffee}
+            meds={routine.morning}
+            timeLabel="morning"
             colorClass="bg-amber-500"
           />
         )}
         {routine.midday.length > 0 && (
-          <Section 
-            title="Midday" 
-            icon={Sun} 
-            meds={routine.midday} 
-            timeLabel="midday" 
+          <Section
+            title="Midday"
+            icon={Sun}
+            meds={routine.midday}
+            timeLabel="midday"
             colorClass="bg-orange-500"
           />
         )}
         {routine.afternoon.length > 0 && (
-          <Section 
-            title="Afternoon" 
-            icon={CloudSun} 
-            meds={routine.afternoon} 
-            timeLabel="afternoon" 
+          <Section
+            title="Afternoon"
+            icon={CloudSun}
+            meds={routine.afternoon}
+            timeLabel="afternoon"
             colorClass="bg-orange-600"
           />
         )}
         {routine.night.length > 0 && (
-          <Section 
-            title="Night" 
-            icon={Moon} 
-            meds={routine.night} 
-            timeLabel="night" 
+          <Section
+            title="Night"
+            icon={Moon}
+            meds={routine.night}
+            timeLabel="night"
             colorClass="bg-indigo-900"
           />
         )}
         {routine.beforeBed.length > 0 && (
-          <Section 
-            title="Before Bed" 
-            icon={Bed} 
-            meds={routine.beforeBed} 
-            timeLabel="beforeBed" 
+          <Section
+            title="Before Bed"
+            icon={Bed}
+            meds={routine.beforeBed}
+            timeLabel="beforeBed"
             colorClass="bg-slate-900"
           />
         )}

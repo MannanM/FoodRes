@@ -12,9 +12,12 @@ DATA MODELS:
 - `name` (String, e.g., "Low-dose Naltrexone", "Psyllium Husk", "Osmolax")
 - `baseUnit` (Enum: 'mg', 'g', 'ml', 'unit/tablet')
 - `scheduleDose` (Object): 
-   - `morning` (Number, amount in baseUnit)
-   - `midday` (Number, amount in baseUnit)
-   - `night` (Number, amount in baseUnit)
+   - `wakeup` (Number, amount in baseUnit, Optional)
+   - `morning` (Number, amount in baseUnit, Optional)
+   - `midday` (Number, amount in baseUnit, Optional)
+   - `afternoon` (Number, amount in baseUnit, Optional)
+   - `night` (Number, amount in baseUnit, Optional)
+   - `beforeBed` (Number, amount in baseUnit, Optional)
 - `scriptRepeatsRemaining` (Number, Optional)
 - `scriptExpiryDate` (Date, Optional)
 - `lastStockTakeDate` (Date, tracks when the baseline was last verified)
@@ -31,7 +34,7 @@ DATA MODELS:
 AUTO-CALCULATION & RUN-OUT MATH:
 Unlike food, Medication relies on *Passive Auto-Deduction* based on the daily schedule.
 Calculate current stock dynamically on the fly:
-- Step 1: Calculate "Total Daily Need" = `morning + midday + night` (in baseUnits).
+- Step 1: Calculate "Total Daily Need" = Sum of all schedule slots (treat `null`/`0` as 0).
 - Step 2: Calculate "Total Pool" (in baseUnits) = Sum of all `MedInventoryBatch` records `(quantity * sizePerQuantity)`.
 - Step 3: Calculate "Days Passed" = Days elapsed since `lastStockTakeDate`.
 - Step 4: Calculate "Consumed Since Stock Take" (in baseUnits) = `Days Passed * Total Daily Need`.
@@ -41,13 +44,13 @@ Calculate current stock dynamically on the fly:
 
 CORE VIEWS & FUNCTIONALITY:
 - Meds Dashboard:
-Show a list of all Medications with calculated run-out metrics and daily routine. Color code the Run-Out Date (Red < 14 days, Yellow < 30 days, Green > 30 days). Clicking a medication enters the **Medication Detail View**.
+Show a list of all Medications with calculated run-out metrics and daily routine. Inventory is displayed as **"X doses"** (calculated as `Days Remaining`) for better clarity. Color code the Run-Out Date (Red < 14 days, Yellow < 30 days, Green > 30 days). Clicking a medication enters the **Medication Detail View**.
 
 - Medication Detail View:
-Provides a deep dive into a specific medication, listing the full **Stock History** (all batches currently in possession), the active dosage schedule, and a summary of the last physical stock take.
+Provides a deep dive into a specific medication, listing the full **Stock History**, the active dosage schedule, and a summary of the last physical stock take. The **Active Schedule** uses prominent cards for each slot and hides any slots with a zero dose.
 
 - Daily Routine Summary:
-A specialized view showing all medications grouped by time of day (**Morning**, **Midday**, **Night**) for a quick daily checklist.
+A specialized view showing all medications grouped by time of day. Only time slots with medications scheduled are displayed. Uses a single-column layout for maximum readability.
 
 - Add/Edit Medication & Dosage Changes:
 When editing a `MedicationProfile`, if the dosage schedule is changed, the system forces a **Physical Stock Take**. This updates the `lastStockTakeDate` to 'Today' and overwrites previous batches with the new physical count to ensure future accuracy.
